@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vending Machine</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+<body onload="onLoad();">
+
+<div class="container">
+    <div class="drinks">
+        Loading :)
+        <!--<div th:each="drink: ${drinks}">
+            LOADING
+            <div class="drink">
+                <img th:src="${drink.name.toLowerCase()} + '.png'" th:alt="${drink.name.toLowerCase()}">
+                <img th:src="${drink.name.toLowerCase()} + '.png'" th:alt="${drink.name.toLowerCase()}" style="position: relative; transform: translate(-100px, -20px); z-index: -9997;">
+                <img th:src="${drink.name.toLowerCase()} + '.png'" th:alt="${drink.name.toLowerCase()}" style="position: relative; transform: translate(-200px, -30px); z-index: -9998;">
+                <img th:src="${drink.name.toLowerCase()} + '.png'" th:alt="${drink.name.toLowerCase()}" style="position: relative; transform: translate(-300px, -40px); z-index: -9999;">
+                <br><span><span th:text="${drink.getBottleCount()}"></span> bottles left</span>
+                <br><span><span th:text="${drink.getPrice()}"></span> Kč</span>
+                <button th:attr="onclick=|selectDrink('${drink.getId()}', '${drink.getName()}', '${drink.getPrice()}')|">Select</button>
+            </div>
+        </div>-->
+    </div>
+    <div class="display">
+        <p id="selectedDrink">Please select a drink.</p>
+        <p><strong>Price:</strong> <span id="price">0 Kč</span></p>
+        <p id="cash">Current cash balance: <span id="balance">0</span> Kč</p>
+        <button onclick="returnChange()">Return Change</button>
+        <br>
+        <label for="cash_payment_method">Cash</label>
+        <input type="radio" name="payment_method" value="cash" id="cash_payment_method">
+        <br>
+        <label for="card_payment_method">Card</label>
+        <input type="radio" name="payment_method" value="card" id="card_payment_method">
+        <br>
+        <button class="payButton" onclick="payNow();">Pay Now</button>
+        <button class="coinsButton" onclick="toggleCoinModal();">Add coins to machine</button>
+    </div>
+</div>
+
+
+<!-- Modal dialog -->
+<div class="modal" id="coinModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Click a coin to insert it to the machine's cash balance</h4>
+                <button type="button" onclick="toggleCoinModal();">
+                    <span aria-hidden="false">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <a href="#" onclick="addToCoinBalance(1);"><img id="coin1" src="coins/1.png"></a>
+                <a href="#" onclick="addToCoinBalance(2);"><img id="coin2" src="coins/2.png"></a>
+                <a href="#" onclick="addToCoinBalance(5);"><img id="coin5" src="coins/5.png"></a>
+                <a href="#" onclick="addToCoinBalance(10);"><img id="coin10" src="coins/10.png"></a>
+                <a href="#" onclick="addToCoinBalance(20);"><img id="coin20" src="coins/20.png"></a>
+                <a href="#" onclick="addToCoinBalance(50);"><img id="coin50" src="coins/50.png"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="returnModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              Here is your change:
+            </div>
+            <div class="modal-body">
+              <div id="change">
+
+              </div>
+            </div>
+            <button onclick="this.parentNode.parentNode.parentNode.style.display='none';">Close this dialog</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="glopglopModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Enjoy!</h2>
+            </div>
+            <div id="drink">
+                Your drink cost <span id="cost"></span> Kč!
+                <img width="100%" height="auto" src="">
+            </div>
+            <p>
+                You can now buy another drink or get your change back by pressing Return Change.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function onLoad() {
+        updateDrinks();
+
+    }
+
+    function showFinalImage(dataObj) {
+        var drink = dataObj["selectedDrink"]["name"].toLowerCase()
+        console.log(drink)
+
+        $('#drink img').attr('src', `${drink}.gif`)
+        $('#cost').html(dataObj["selectedDrink"]["price"])
+        $('#glopglopModal').fadeIn(500).show().delay(5000).fadeOut()
+    }
+
+    function updateDrinks() {
+        fetch('/vendingmachine/getDrinks', { method: 'GET' })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('API request failed');
+                }
+            })
+            .then(data => {
+                var drinksDiv = $(".drinks");
+                drinksDiv.empty();
+                data.forEach((drink, index) => {
+                    // Create new div element
+                    var drinkDiv = $('<div class="drink"></div>');
+
+                    // Set image source and alt text using thymeleaf variables
+                    var imgsrc = `${drink.name.toLowerCase()}.png`;
+                    var imgalt = `${drink.name.toLowerCase()}`;
+
+                    var imgElement = $('<img/>')
+                    imgElement.attr("src", imgsrc)
+                    imgElement.attr("alt", imgalt)
+                    //drinkDiv.append('<img src="' + imgsrc + '" alt="' + imgalt + '">');
+
+                    // Bottle count
+                    let bottleCount = drink.bottleCount;
+                    if (bottleCount === 0) {
+                        imgElement.addClass("outofstock");
+                    }
+                    drinkDiv.append(imgElement);
+
+                    const bottleCountText = bottleCount === 0 ? 'Out of stock' : `${bottleCount} bottles left`;
+
+                    drinkDiv.append(`<br><span> ${bottleCountText}</span>`);
+                    drinkDiv.append(`<br><span><span>${drink.price}</span> Kč</span>`)
+
+                    // Select button
+                    var selectButtonText = "Select";
+                    var selectButtonOnclick = "selectDrink('" + drink.id + "', '" + selectButtonText + "', " + drink.price + ")";
+                    drinkDiv.append(`<br><button onclick="${selectButtonOnclick}">Select</button>`);
+                    console.log(drinkDiv)
+                    // Append our new drink
+                    drinksDiv.append(drinkDiv)
+                })
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
+    function updateCurrentBalance(dataObj) {
+        var cashBalance = dataObj["cashBalance"];
+        console.log("The balance is now", cashBalance);
+        document.getElementById("balance").innerText = cashBalance;
+    }
+    function toggleCoinModal() {
+        var modalEl = document.getElementById("coinModal");
+        if (modalEl.style.display === "block") {
+            modalEl.style.display = "none";
+        } else {
+
+            $(".coinAnimated").remove();
+            modalEl.style.display = "block";
+        }
+    }
+
+    function addToCoinBalance(coinInput) {
+
+        fetch('/vendingmachine/addCashBalance', { method: 'POST', body: coinInput })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('API request failed');
+                }
+            })
+            .then(data => {
+                console.log("Yay", data)
+
+                var img = $(`#coin${coinInput}`);
+                var imgClone = img.clone();
+
+                imgClone.css("z-index", "9999")
+                imgClone.css("position", "absolute")
+                imgClone.css("left", img.position().left)
+                imgClone.css("top", img.position().top)
+                imgClone.css("width", "50px")
+                imgClone.attr("id", "fakecoin")
+                imgClone.addClass("coinAnimated")
+                $("#coinModal .modal-content").append(imgClone)
+
+                updateCurrentBalance(data)
+                updateDrinks()
+
+            })
+            .catch(error => {
+                // Handle any errors here
+                updateDrinks()
+                console.error(error); // Example: Logging the error to the console
+            });
+    }
+
+    function selectDrink(id, drink, price) {
+        document.getElementById('selectedDrink').innerText = drink;
+        document.getElementById('price').innerText = price + " Kč";
+
+        fetch('/vendingmachine/selectDrink', { method: 'POST', body: id })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('API request failed');
+                }
+            })
+            .then(data => {
+                console.log("Selected drink", data)
+                updateCurrentBalance(data)
+                updateDrinks()
+
+
+            })
+            .catch(error => {
+                updateDrinks()
+                console.error(error);
+            });
+    }
+    function returnChange() {
+        fetch('/vendingmachine/returnChange', { method: 'GET' })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Parse the response data as JSON
+
+                } else {
+                    throw new Error('API request failed');
+                }
+            })
+            .then(data => {
+                updateCurrentBalance(data);
+                console.log(data);
+                change = document.getElementById("change");
+                change.innerHTML = "";
+                modal = document.getElementById("returnModal");
+                $("#returnModal").fadeIn(250).show();
+                //modal.style.display = "block";
+                console.log(data["data"] === null);
+
+                if ($.isEmptyObject(data["data"])) {
+                    $("#returnModal").find(".modal-header").text("Sorry, you didn't put in any coins yet!")
+                } else {
+                    $("#returnModal").find(".modal-header").text("Here is your change: ")
+                }
+
+                for (const [k, v] of Object.entries(data["data"])) {
+                    console.log("k = ",k, "v=", v);
+                    for (let i = 0; i < v; i++) {
+                        change.innerHTML += "<img class='coin' src='coins/" + k + ".png'>";
+                    }
+                }
+
+            })
+            .catch(error => {
+                $("#returnModal").fadeIn(250).show();
+                $("#returnModal").find(".modal-header").text(`Error occurred: ${error}`)
+                console.error(error);
+
+            });
+    }
+
+    function payNow() {
+        const paymentMethodEl = document.querySelector('input[name="payment_method"]:checked');
+        var paymentMethod;
+
+        if (!paymentMethodEl) {
+            alert('Please check cash or card!')
+            return;
+        }
+
+        paymentMethod = paymentMethodEl.value.toLowerCase();
+        console.log("Chosen payment method:",paymentMethod);
+        fetch('/vendingmachine/pay', { method: 'POST', body: paymentMethod })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Parse the response data as JSON
+
+                } else {
+                    throw new Error('API request failed');
+                }
+            })
+            .then(data => {
+                console.log(data);
+                if (data["status"] === "ok") {
+                    updateCurrentBalance(data)
+                    updateDrinks()
+                    showFinalImage(data)
+
+                }
+                else if(data["status"] === "fail") {
+                    updateCurrentBalance(data)
+                    alert('Sorry payment has failed: ' + data["data"])
+                }
+
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+    }
+</script>
+
+</body>
+</html>

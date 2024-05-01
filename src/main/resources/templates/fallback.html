@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Drink Dispenser Machine</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <h1 class="text-center">Drink Dispenser Machine</h1>
+  <hr>
+  <form>
+    <div class="row justify-content-center">
+      <div class="col-lg-3 col-md-6 mb-4">
+        <label for="drinkType" class="mb-2">Choose a drink</label>
+        <select id="drinkType" class="form-control">
+          <option value="coffee">Coffee</option>
+          <option value="tea">Tea</option>
+          <option value="soda">Soda</option>
+          <option value="juice">Juice</option>
+        </select>
+      </div>
+    </div>
+    <div class="row justify-content-center mt-4">
+      <div class="col-lg-3 col-md-6 text-center">
+        <button type="submit" class="btn btn-primary">Order</button>
+      </div>
+    </div>
+  </form>
+  <hr>
+  <div class="row justify-content-center mt-4">
+    <div class="col-lg-3 col-md-6 text-center">
+      <p id="displayDrink" class="font-weight-bold"></p>
+      <p id="displayPrice" class="text-muted"></p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

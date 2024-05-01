@@ -1,0 +1,199 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+
+    max-width: 500px;
+    margin: auto;
+}
+
+.container {
+    position: relative;
+    width: 540px;
+    height: 910px;
+    background-image: url('dispenser.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding: 50px 20px;
+}
+
+.drinks {
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 50px;
+    padding-right: 50px;
+    padding-left: 50px;
+
+}
+
+.drink {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    /*max-width: 120px;*/
+}
+
+.drink img {
+    width: 120px; /* Adjust according to your image size */
+    height: auto;
+}
+
+.drink button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    background-color: #ea5a5a;
+    color: #fff;
+    border: 0;
+    cursor: pointer;
+    border-radius: 5px;
+
+    width: 50%;
+}
+
+.payButton {
+    background-color: #346f07 !important;
+}
+
+.coinsButton {
+    background-color: #265493 !important;
+}
+
+.display {
+    position: absolute;
+    top: 40%;
+    right: 0px;
+    transform: translateY(-50%);
+    width: 83px;
+    padding: 20px;
+    background-color: #201c19;
+    color: #ffffff;
+    border-radius: 10px;
+    text-align: center;
+    opacity: 0.9;
+}
+
+.display p {
+    margin: 0 0 10px;
+}
+
+.display button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #ea5a5a;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.modal-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20vw;
+    max-width: 400px;
+    padding: 8px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.modal {
+    position: fixed; /* Stay in place */
+    z-index: 1050; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    display: none;
+}
+
+.modal-body img {
+    width: 50px;
+}
+/*
+.coinModal img:focus {
+    animation-name: bounce;
+    -moz-animation-name: bounce;
+
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: 1;
+}
+
+.coinModal img:active {
+    animation-name: none;
+    -moz-animation-name: none;
+
+}
+*/
+
+
+@keyframes bounce {
+    0% {
+        transform:         translateY(0)
+    }
+    50% {
+        transform:         translateY(-20px)
+    }
+    100% {
+        transform:         translateY(0px)
+    }
+}
+
+@keyframes flyaway {
+    0% {
+        transform: translateY(-50px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-400px);
+        opacity: 0;
+    }
+}
+
+.coinAnimated {
+    animation: flyaway;
+    opacity: 1;
+
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    animation-timing-function: ease-in-out;
+}
+
+.coinAnimated.off {
+    animation-name: none;
+}
+
+.outofstock {
+    filter: grayscale(100);
+}
